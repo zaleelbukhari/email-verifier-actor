@@ -128,6 +128,7 @@ async def main() -> None:
             "invalid": 0,
             "risky": 0,
             "unknown": 0,
+            "blacklist_warnings": 0,
         }
         start_time = time.monotonic()
 
@@ -158,6 +159,24 @@ async def main() -> None:
                 status = result.get("status", "unknown")
                 counters["completed"] += 1
                 counters[status] = counters.get(status, 0) + 1
+
+                # ── BLACKLIST DETECTION ──
+                # Check SMTP responses for common IP blocklist indicators
+                smtp_resp = str(result.get("smtp_response", "")).lower()
+                error_msg = str(result.get("error_message", "")).lower()
+                
+                blacklist_keywords = [
+                    "blacklisted", "blocked", "spamhaus", "banned", 
+                    "sorbs", "barracuda", "spamcop", "zen.", "bbl.", "client host rejected"
+                ]
+                
+                if any(kw in smtp_resp or kw in error_msg for kw in blacklist_keywords):
+                    counters["blacklist_warnings"] += 1
+                    Actor.log.error(
+                        f"🚨 IP BLACKLIST WARNING 🚨 "
+                        f"Target server rejected connection for {email}. "
+                        f"Response: {result.get('smtp_response') or result.get('error_message')}"
+                    )
 
                 # Update status message every 5 completions or at the end
                 completed = counters["completed"]
@@ -207,6 +226,7 @@ async def main() -> None:
                 "invalid": counters["invalid"] + invalid_format_count,
                 "risky": counters["risky"],
                 "unknown": counters["unknown"],
+                "blacklist_warnings": counters["blacklist_warnings"],
             },
             "performance": {
                 "elapsed_seconds": round(elapsed_total, 1),
