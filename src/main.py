@@ -136,9 +136,6 @@ async def main() -> None:
 
         async def process_email(email: str) -> None:
             """Verify a single email with concurrency control."""
-            # Check if user's budget is exhausted
-            if charging_manager.is_at_max_event_count:
-                return
 
             async with semaphore:
                 result = await verify_email(
