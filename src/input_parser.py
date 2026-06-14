@@ -42,7 +42,7 @@ def validate_email_format(email: str) -> bool:
     return EMAIL_REGEX.match(email) is not None
 
 
-async def parse_input(actor_input: dict) -> list[str]:
+async def parse_input(actor_input: dict) -> list[dict]:
     """
     Parse emails from the actor input.
 
@@ -51,7 +51,7 @@ async def parse_input(actor_input: dict) -> list[str]:
     2. CSV file URL in the 'csvUrl' field
     3. Apify dataset ID in the 'datasetId' field
 
-    Returns a list of raw email strings (not yet validated or deduplicated).
+    Returns a list of dictionaries (rows) with a special '__email__' key containing the raw email string.
     """
     emails = []
 
@@ -65,7 +65,7 @@ async def parse_input(actor_input: dict) -> list[str]:
         ]
         if valid:
             Actor.log.info(f"📋 Found {len(valid)} emails from direct input")
-            emails.extend(valid)
+            emails.extend([{"email": e, "__email__": e} for e in valid])
 
     # Method 2: CSV file URL
     csv_url = actor_input.get("csvUrl", "").strip()
@@ -98,7 +98,7 @@ async def parse_input(actor_input: dict) -> list[str]:
     return emails
 
 
-async def _parse_csv_url(url: str, email_column: str = "") -> list[str]:
+async def _parse_csv_url(url: str, email_column: str = "") -> list[dict]:
     """Download and parse a CSV file from a URL."""
     # Auto-convert Google Sheets sharing links to CSV export links (massive UX win)
     if "docs.google.com/spreadsheets" in url and "/edit" in url:
@@ -139,7 +139,7 @@ async def _parse_csv_url(url: str, email_column: str = "") -> list[str]:
     return _extract_emails_from_csv(text, email_column)
 
 
-async def _parse_dataset(dataset_id: str, email_column: str = "") -> list[str]:
+async def _parse_dataset(dataset_id: str, email_column: str = "") -> list[dict]:
     """Read emails from an existing Apify dataset."""
     Actor.log.info(f"📥 Reading from Apify dataset: {dataset_id}")
 
@@ -170,13 +170,15 @@ async def _parse_dataset(dataset_id: str, email_column: str = "") -> list[str]:
     for item in items:
         val = item.get(column, "")
         if val and isinstance(val, str) and val.strip():
-            emails.append(val.strip())
+            row_dict = dict(item)
+            row_dict["__email__"] = val.strip()
+            emails.append(row_dict)
 
     Actor.log.info(f"Found email column: '{column}' ({len(emails)} emails)")
     return emails
 
 
-def _extract_emails_from_csv(text: str, email_column: str = "") -> list[str]:
+def _extract_emails_from_csv(text: str, email_column: str = "") -> list[dict]:
     """Extract emails from CSV text content."""
     reader = csv.DictReader(io.StringIO(text))
 
@@ -204,7 +206,9 @@ def _extract_emails_from_csv(text: str, email_column: str = "") -> list[str]:
     for row in reader:
         val = row.get(column, "")
         if val and val.strip():
-            emails.append(val.strip())
+            row_dict = dict(row)
+            row_dict["__email__"] = val.strip()
+            emails.append(row_dict)
 
     return emails
 

@@ -38,6 +38,7 @@ Email Verifier Pro performs **7 checks** on every email address:
 - 💰 **Cheapest Full-SMTP Validation:** Just $0.85 per 1,000 emails. Others charge $2.00+ for the same accuracy.
 - 🎁 **100 Email Free Trial:** Users on the free Apify plan can fetch up to 100 leads per run to test the accuracy before paying!
 - 🛡️ **Role-Based & Disposable Detection:** Automatically flags `info@`, `admin@`, and temporary inboxes.
+- 🔗 **Keeps Your Original Data:** Upload a CSV with names, companies, and custom IDs. We'll append the verification results without throwing away your original columns!
 - 📈 **Live Progress Tracking:** See valid/invalid ratios in real-time as your list processes.)
 
 1. **Syntax validation** — Is the email format correct? (`user@domain.com`)
@@ -75,7 +76,7 @@ If you've already scraped emails with another actor, paste the **Dataset ID** in
 
 ## Output
 
-Each email produces a result row with these fields:
+Each email produces a result row containing all of your original input columns (if you used a CSV or Dataset), plus our appended verification fields:
 
 ```json
 {

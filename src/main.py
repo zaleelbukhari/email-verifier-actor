@@ -67,18 +67,21 @@ async def main() -> None:
         seen = set()
         emails = []
         invalid_format_count = 0
-        for email in raw_emails:
-            email_lower = email.strip().lower()
+        for row in raw_emails:
+            email_val = row.get("__email__", "")
+            email_lower = email_val.strip().lower()
             if not email_lower or email_lower in seen:
                 continue
             seen.add(email_lower)
             if validate_email_format(email_lower):
-                emails.append(email_lower)
+                emails.append(row)
             else:
                 invalid_format_count += 1
                 # Push invalid-format emails immediately
-                await Actor.push_data({
-                    "email": email.strip(),
+                result_row = dict(row)
+                result_row.pop("__email__", None)
+                result_row.update({
+                    "email": email_val.strip(),
                     "status": "invalid",
                     "is_reachable": "invalid",
                     "is_disposable": False,
@@ -93,6 +96,7 @@ async def main() -> None:
                     "error_message": "Email address has invalid syntax",
                     "verified_at": datetime.now(timezone.utc).isoformat(),
                 })
+                await Actor.push_data(result_row)
 
         # Apply max emails cap
         effective_cap = MAX_EMAILS_HARD_CAP
@@ -139,19 +143,25 @@ async def main() -> None:
         # Check charging limits
         charging_manager = Actor.get_charging_manager()
 
-        async def process_email(email: str) -> None:
+        async def process_email(row: dict) -> None:
             """Verify a single email with concurrency control."""
+            email_val = row.get("__email__", "")
 
             async with semaphore:
                 result = await verify_email(
                     session=session,
-                    email=email,
+                    email=email_val,
                     max_retries=max_retries,
                     timeout=timeout,
                 )
 
+                # Merge verification result into original row
+                final_result = dict(row)
+                final_result.pop("__email__", None)
+                final_result.update(result)
+
                 # Push result to dataset immediately (live results)
-                await Actor.push_data(result)
+                await Actor.push_data(final_result)
 
                 # Update counters
                 status = result.get("status", "unknown")
@@ -207,7 +217,7 @@ async def main() -> None:
             f"🔍 Verifying {total} emails (concurrency: {concurrency})..."
         )
 
-        tasks = [process_email(email) for email in emails]
+        tasks = [process_email(row) for row in emails]
         await asyncio.gather(*tasks, return_exceptions=True)
 
         await close_session(session)
