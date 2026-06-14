@@ -132,6 +132,7 @@ async def main() -> None:
             "unknown": 0,
             "blacklist_warnings": 0,
             "last_blacklist_error": "",
+            "last_status_update": time.monotonic(),
         }
         start_time = time.monotonic()
 
@@ -173,10 +174,12 @@ async def main() -> None:
                     # Hide from public logs, only show in debug mode
                     Actor.log.debug(f"Blacklist keyword detected: {counters['last_blacklist_error']}")
 
-                # Update status message every 5 completions or at the end
+                # Update status message every 3 seconds or at the end
                 completed = counters["completed"]
-                if completed % 5 == 0 or completed == total:
-                    elapsed = time.monotonic() - start_time
+                current_time = time.monotonic()
+                if current_time - counters["last_status_update"] >= 3.0 or completed == total:
+                    counters["last_status_update"] = current_time
+                    elapsed = current_time - start_time
                     rate = completed / elapsed if elapsed > 0 else 0
                     remaining = total - completed
                     eta_seconds = remaining / rate if rate > 0 else 0
