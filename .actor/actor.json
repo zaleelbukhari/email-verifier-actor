@@ -24,7 +24,6 @@
     "storages": {
         "dataset": {
             "actorSpecification": 1,
-            "schema": "./dataset_schema.json",
             "title": "Verified Emails",
             "views": {
                 "overview": {
