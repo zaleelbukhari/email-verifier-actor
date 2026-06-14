@@ -147,7 +147,7 @@ High bounce rates damage your sender reputation and can get your domain blacklis
 We perform a **real SMTP handshake** with the recipient's mail server — the same process an actual email uses. This gives 95%+ accuracy for most providers. Catch-all domains are the exception: these accept all emails regardless, so we flag them as `risky` rather than giving a false `valid`.
 
 ### How fast is the verification?
-With the default concurrency of 10, you can verify approximately **1,000–2,000 emails per minute** depending on how quickly the recipient mail servers respond. Gmail and Outlook are typically fast; smaller providers may be slower.
+With the default concurrency of 10, you can verify approximately **1,000 emails every 2 to 3 minutes** depending on how quickly the recipient mail servers respond. Gmail and Outlook are typically fast; smaller providers may be slower.
 
 ### Can I verify Gmail, Outlook, and Yahoo addresses?
 Yes! We verify emails across all providers including Gmail, Outlook/Hotmail, Yahoo, custom domains, and more.
