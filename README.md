@@ -1,4 +1,4 @@
-# Email Verifier Pro | $0.75/1k — Bulk Email Validation & List Cleaning
+# Email Verifier Pro | $0.85/1k — Bulk Email Validation & List Cleaning
 
 Verify email addresses at scale with **real SMTP checks** — not just syntax validation. Email Verifier Pro connects directly to mail servers to confirm whether a mailbox actually exists, giving you the most accurate results possible.
 
@@ -8,7 +8,7 @@ Verify email addresses at scale with **real SMTP checks** — not just syntax va
 
 | Feature | Email Verifier Pro | Other Actors |
 |:---|:---:|:---:|
-| **Price per 1,000 emails** | **$0.75** | $1.00 – $9.00 |
+| **Price per 1,000 emails** | **$0.85** | $1.00 – $9.00 |
 | Real SMTP verification | ✅ | Some ❌ |
 | Disposable email detection | ✅ | Some ❌ |
 | Catch-all domain detection | ✅ | Some ❌ |
@@ -35,7 +35,7 @@ Email Verifier Pro performs **7 checks** on every email address:
 ### Why Choose Email Verifier Pro?
 - ⚡ **Lightning Fast:** Defaults to 10 simultaneous connections. Verify massive lists in minutes, not hours.
 - 🎯 **Deep SMTP Validation:** We don't just check syntax. We talk directly to the target mail server.
-- 💰 **Cheapest Full-SMTP Validation:** Just $0.75 per 1,000 emails. Others charge $2.00+ for the same accuracy.
+- 💰 **Cheapest Full-SMTP Validation:** Just $0.85 per 1,000 emails. Others charge $2.00+ for the same accuracy.
 - 🎁 **100 Email Free Trial:** Users on the free Apify plan can fetch up to 100 leads per run to test the accuracy before paying!
 - 🛡️ **Role-Based & Disposable Detection:** Automatically flags `info@`, `admin@`, and temporary inboxes.
 - 📈 **Live Progress Tracking:** See valid/invalid ratios in real-time as your list processes.)
@@ -125,7 +125,7 @@ High bounce rates damage your sender reputation and can get your domain blacklis
 
 ## Pricing
 
-**$0.75 per 1,000 emails verified** — the most affordable full-SMTP verification on the Apify Store.
+**$0.85 per 1,000 emails verified** — the most affordable full-SMTP verification on the Apify Store.
 
 - No external API keys required
 - No hidden fees or dual billing
@@ -136,10 +136,10 @@ High bounce rates damage your sender reputation and can get your domain blacklis
 
 | List Size | Cost |
 |:---|:---|
-| 1,000 emails | $0.75 |
-| 10,000 emails | $7.50 |
-| 50,000 emails | $37.50 |
-| 100,000 emails | $75.00 |
+| 1,000 emails | $0.85 |
+| 10,000 emails | $8.50 |
+| 50,000 emails | $42.50 |
+| 100,000 emails | $85.00 |
 
 ## Frequently Asked Questions
 
