@@ -7,7 +7,8 @@
     "defaultDatasetUrl": {
       "type": "string",
       "title": "Verified Emails Dataset",
-      "description": "URL to the dataset containing the verification results"
+      "description": "URL to the dataset containing the verification results",
+      "template": "{{links.apiDefaultDatasetUrl}}"
     }
   }
 }
