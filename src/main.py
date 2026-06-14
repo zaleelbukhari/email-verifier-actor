@@ -32,7 +32,7 @@ async def main() -> None:
         actor_input = await Actor.get_input() or {}
         Actor.log.info(f"Input received: {list(actor_input.keys())}")
 
-        concurrency = min(actor_input.get("concurrency", 5), 15)
+        concurrency = min(actor_input.get("concurrency", 10), 30)
         max_retries = min(actor_input.get("maxRetries", 2), 5)
         timeout = min(actor_input.get("timeout", 30), 120)
         max_emails = actor_input.get("maxEmails", 0)

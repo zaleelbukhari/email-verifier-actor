@@ -40,10 +40,10 @@
             "sectionDescription": "Fine-tune verification speed, retries, and timeouts. The defaults work great for most use cases.",
             "title": "Concurrency",
             "type": "integer",
-            "description": "Number of emails to verify simultaneously. Higher = faster but may trigger rate limits on some mail servers. Recommended: 3–5.",
-            "default": 5,
+            "description": "Number of emails to verify simultaneously. Higher = faster but may trigger rate limits on some mail servers.",
+            "default": 10,
             "minimum": 1,
-            "maximum": 15,
+            "maximum": 30,
             "editor": "number"
         },
         "maxRetries": {
@@ -65,13 +65,18 @@
             "editor": "number"
         },
         "maxEmails": {
-            "title": "Max Emails to Verify",
+            "title": "Maximum Emails (Optional)",
             "type": "integer",
-            "description": "Maximum number of emails to verify in this run. Set to 0 for no limit (up to 50,000). Useful for testing with a small sample before running a full list.",
-            "default": 0,
-            "minimum": 0,
-            "maximum": 50000,
+            "description": "Maximum number of emails to verify in this run. Leave empty for no limit.",
+            "minimum": 1,
             "editor": "number"
+        },
+        "freeTierNotice": {
+            "title": "ℹ️ Notice",
+            "type": "string",
+            "description": "Try up to 100 emails for free using the Apify Free Trial (configure in your Apify settings).",
+            "editor": "hidden",
+            "default": " "
         }
     },
     "required": []

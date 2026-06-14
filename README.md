@@ -32,6 +32,14 @@ Verify email addresses at scale with **real SMTP checks** — not just syntax va
 
 Email Verifier Pro performs **7 checks** on every email address:
 
+### Why Choose Email Verifier Pro?
+- ⚡ **Lightning Fast:** Defaults to 10 simultaneous connections. Verify massive lists in minutes, not hours.
+- 🎯 **Deep SMTP Validation:** We don't just check syntax. We talk directly to the target mail server.
+- 💰 **Cheapest Full-SMTP Validation:** Just $0.75 per 1,000 emails. Others charge $2.00+ for the same accuracy.
+- 🎁 **100 Email Free Trial:** Users on the free Apify plan can fetch up to 100 leads per run to test the accuracy before paying!
+- 🛡️ **Role-Based & Disposable Detection:** Automatically flags `info@`, `admin@`, and temporary inboxes.
+- 📈 **Live Progress Tracking:** See valid/invalid ratios in real-time as your list processes.)
+
 1. **Syntax validation** — Is the email format correct? (`user@domain.com`)
 2. **MX record lookup** — Does the domain have a mail server configured?
 3. **SMTP handshake** — Can we connect to the mail server and confirm the mailbox exists?
@@ -60,7 +68,7 @@ If you've already scraped emails with another actor, paste the **Dataset ID** in
 
 | Setting | Default | Description |
 |:---|:---|:---|
-| Concurrency | 5 | Emails verified simultaneously (1–15) |
+| Concurrency | 10 | Emails verified simultaneously (1–30) |
 | Max Retries | 2 | Retry count for temporary SMTP failures |
 | Timeout | 30s | Max wait time per email |
 | Max Emails | No limit | Cap the number of emails per run (up to 50,000) |
@@ -139,7 +147,7 @@ High bounce rates damage your sender reputation and can get your domain blacklis
 We perform a **real SMTP handshake** with the recipient's mail server — the same process an actual email uses. This gives 95%+ accuracy for most providers. Catch-all domains are the exception: these accept all emails regardless, so we flag them as `risky` rather than giving a false `valid`.
 
 ### How fast is the verification?
-With the default concurrency of 5, you can verify approximately **500–1,000 emails per minute** depending on how quickly the recipient mail servers respond. Gmail and Outlook are typically fast; smaller providers may be slower.
+With the default concurrency of 10, you can verify approximately **1,000–2,000 emails per minute** depending on how quickly the recipient mail servers respond. Gmail and Outlook are typically fast; smaller providers may be slower.
 
 ### Can I verify Gmail, Outlook, and Yahoo addresses?
 Yes! We verify emails across all providers including Gmail, Outlook/Hotmail, Yahoo, custom domains, and more.
@@ -174,7 +182,7 @@ const client = new ApifyClient({ token: 'YOUR_API_TOKEN' });
 
 const run = await client.actor("YOUR_USERNAME/email-verifier-pro").call({
     emails: ["test@gmail.com", "contact@company.com"],
-    concurrency: 5
+    concurrency: 10
 });
 
 const { items } = await client.dataset(run.defaultDatasetId).listItems();
@@ -190,7 +198,7 @@ client = ApifyClient("YOUR_API_TOKEN")
 
 run = client.actor("YOUR_USERNAME/email-verifier-pro").call(run_input={
     "emails": ["test@gmail.com", "contact@company.com"],
-    "concurrency": 5
+    "concurrency": 10
 })
 
 for item in client.dataset(run["defaultDatasetId"]).iterate_items():
