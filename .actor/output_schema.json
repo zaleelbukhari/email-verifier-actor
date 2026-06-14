@@ -1,0 +1,13 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Email Verifier Pro Output",
+  "description": "Output links for Email Verifier Pro",
+  "type": "object",
+  "properties": {
+    "defaultDatasetUrl": {
+      "type": "string",
+      "title": "Verified Emails Dataset",
+      "description": "URL to the dataset containing the verification results"
+    }
+  }
+}
