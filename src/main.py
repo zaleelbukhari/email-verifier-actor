@@ -152,12 +152,6 @@ async def main() -> None:
                 # Push result to dataset immediately (live results)
                 await Actor.push_data(result)
 
-                # Charge per verified email
-                try:
-                    await Actor.charge(event_name="email-verified", count=1)
-                except Exception:
-                    pass  # Don't fail on charge errors
-
                 # Update counters
                 status = result.get("status", "unknown")
                 counters["completed"] += 1
