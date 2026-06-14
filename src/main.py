@@ -8,6 +8,8 @@ and tracks usage analytics.
 
 import asyncio
 import time
+import os
+import aiohttp
 from datetime import datetime, timezone
 
 from apify import Actor
@@ -129,6 +131,7 @@ async def main() -> None:
             "risky": 0,
             "unknown": 0,
             "blacklist_warnings": 0,
+            "last_blacklist_error": "",
         }
         start_time = time.monotonic()
 
@@ -172,11 +175,9 @@ async def main() -> None:
                 
                 if any(kw in smtp_resp or kw in error_msg for kw in blacklist_keywords):
                     counters["blacklist_warnings"] += 1
-                    Actor.log.error(
-                        f"🚨 IP BLACKLIST WARNING 🚨 "
-                        f"Target server rejected connection for {email}. "
-                        f"Response: {result.get('smtp_response') or result.get('error_message')}"
-                    )
+                    counters["last_blacklist_error"] = result.get('smtp_response') or result.get('error_message')
+                    # Hide from public logs, only show in debug mode
+                    Actor.log.debug(f"Blacklist keyword detected: {counters['last_blacklist_error']}")
 
                 # Update status message every 5 completions or at the end
                 completed = counters["completed"]
@@ -226,7 +227,6 @@ async def main() -> None:
                 "invalid": counters["invalid"] + invalid_format_count,
                 "risky": counters["risky"],
                 "unknown": counters["unknown"],
-                "blacklist_warnings": counters["blacklist_warnings"],
             },
             "performance": {
                 "elapsed_seconds": round(elapsed_total, 1),
@@ -255,7 +255,25 @@ async def main() -> None:
         except Exception as e:
             Actor.log.warning(f"Failed to update usage stats: {e}")
 
-        # ── 7. Final status message ──
+        # ── 7. Send private Admin Alerts ──
+        if counters["blacklist_warnings"] > 0:
+            webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
+            if webhook_url:
+                try:
+                    payload = {
+                        "content": (
+                            f"🚨 **Email Verifier Pro Alert** 🚨\n"
+                            f"Your VPS IP was blocked `{counters['blacklist_warnings']}` times during a user's run.\n"
+                            f"**Last error recorded:**\n```{counters['last_blacklist_error']}```"
+                        )
+                    }
+                    async with aiohttp.ClientSession() as alert_session:
+                        await alert_session.post(webhook_url, json=payload)
+                    Actor.log.debug("Sent private blacklist alert to Discord.")
+                except Exception as e:
+                    Actor.log.debug(f"Failed to send Discord alert: {e}")
+
+        # ── 8. Final status message ──
         total_all = counters["completed"] + invalid_format_count
         valid_pct = round(
             counters["valid"] / total_all * 100, 1
