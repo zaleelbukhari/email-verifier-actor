@@ -1,0 +1,78 @@
+{
+    "title": "Email Verifier Pro",
+    "description": "Verify email addresses in bulk with real SMTP checks. Paste emails directly, provide a CSV URL, or link an existing Apify dataset.",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "emails": {
+            "title": "Email Addresses",
+            "type": "array",
+            "description": "Paste email addresses to verify. One per line.",
+            "editor": "stringList",
+            "prefill": ["test@gmail.com", "nonexistent12345@gmail.com"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "csvUrl": {
+            "title": "CSV File URL",
+            "type": "string",
+            "description": "URL to a CSV file containing email addresses. Supports direct links, Google Sheets (published as CSV), and Dropbox links. The email column is auto-detected, or you can specify it below.",
+            "editor": "textfield",
+            "example": "https://docs.google.com/spreadsheets/d/.../export?format=csv"
+        },
+        "datasetId": {
+            "title": "Apify Dataset ID",
+            "type": "string",
+            "description": "ID of an existing Apify dataset containing emails. Useful for chaining with other actors (e.g., scrape emails → verify them).",
+            "editor": "textfield",
+            "example": "abc123def456"
+        },
+        "emailColumn": {
+            "title": "Email Column Name",
+            "type": "string",
+            "description": "Name of the column containing email addresses in your CSV or dataset. Leave empty for auto-detection (looks for columns named 'email', 'e-mail', 'Email Address', etc.).",
+            "editor": "textfield",
+            "default": ""
+        },
+        "concurrency": {
+            "sectionCaption": "Advanced Settings",
+            "sectionDescription": "Fine-tune verification speed, retries, and timeouts. The defaults work great for most use cases.",
+            "title": "Concurrency",
+            "type": "integer",
+            "description": "Number of emails to verify simultaneously. Higher = faster but may trigger rate limits on some mail servers. Recommended: 3–5.",
+            "default": 5,
+            "minimum": 1,
+            "maximum": 15,
+            "editor": "number"
+        },
+        "maxRetries": {
+            "title": "Max Retries",
+            "type": "integer",
+            "description": "How many times to retry a verification if the mail server times out or returns a temporary error. Set to 0 to disable retries.",
+            "default": 2,
+            "minimum": 0,
+            "maximum": 5,
+            "editor": "number"
+        },
+        "timeout": {
+            "title": "Timeout (seconds)",
+            "type": "integer",
+            "description": "Maximum time to wait for each email verification. Increase this if you're verifying emails on slow or overloaded mail servers.",
+            "default": 30,
+            "minimum": 10,
+            "maximum": 120,
+            "editor": "number"
+        },
+        "maxEmails": {
+            "title": "Max Emails to Verify",
+            "type": "integer",
+            "description": "Maximum number of emails to verify in this run. Set to 0 for no limit (up to 50,000). Useful for testing with a small sample before running a full list.",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 50000,
+            "editor": "number"
+        }
+    },
+    "required": []
+}

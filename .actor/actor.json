@@ -1,0 +1,89 @@
+{
+    "actorSpecification": 1,
+    "name": "email-verifier-pro",
+    "title": "Email Verifier Pro | $0.75/1k - Bulk Email Validator",
+    "description": "Verify email addresses in bulk with real SMTP checks. Detect disposable, role-based, and catch-all emails. CSV upload, live progress, smart retries. Cheapest full-SMTP verifier on the Store at $0.75/1k emails.",
+    "seoTitle": "Email Verifier: Validate & Clean Email Lists in Bulk",
+    "seoDescription": "Bulk email verifier with SMTP validation. Check email deliverability, detect disposable emails & reduce bounce rates. CSV upload supported. $0.75 per 1,000 emails.",
+    "version": "1.0",
+    "buildTag": "latest",
+    "input": "./input_schema.json",
+    "dockerfile": "./Dockerfile",
+    "readme": "../README.md",
+    "categories": ["LEAD_GENERATION"],
+    "pricingModel": {
+        "pricingType": "PAY_PER_EVENT",
+        "pricePerEvent": {
+            "email-verified": {
+                "eventTitle": "Email verified",
+                "eventDescription": "Charged for each email address verified via SMTP",
+                "eventPriceUsd": 0.00075
+            }
+        }
+    },
+    "storages": {
+        "dataset": {
+            "actorSpecification": 1,
+            "title": "Verified Emails",
+            "views": {
+                "overview": {
+                    "title": "Verification Results",
+                    "transformation": {
+                        "fields": [
+                            "email",
+                            "status",
+                            "is_disposable",
+                            "is_role_based",
+                            "is_catch_all",
+                            "is_free_provider",
+                            "mx_host",
+                            "smtp_response",
+                            "verified_at"
+                        ]
+                    },
+                    "display": {
+                        "component": "table",
+                        "properties": {
+                            "email": {
+                                "label": "Email Address",
+                                "format": "text"
+                            },
+                            "status": {
+                                "label": "Status",
+                                "format": "text"
+                            },
+                            "is_disposable": {
+                                "label": "Disposable",
+                                "format": "boolean"
+                            },
+                            "is_role_based": {
+                                "label": "Role-Based",
+                                "format": "boolean"
+                            },
+                            "is_catch_all": {
+                                "label": "Catch-All",
+                                "format": "boolean"
+                            },
+                            "is_free_provider": {
+                                "label": "Free Provider",
+                                "format": "boolean"
+                            },
+                            "mx_host": {
+                                "label": "MX Host",
+                                "format": "text"
+                            },
+                            "smtp_response": {
+                                "label": "SMTP Response",
+                                "format": "text"
+                            },
+                            "verified_at": {
+                                "label": "Verified At",
+                                "format": "text"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
