@@ -1,0 +1,75 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "email": {
+            "title": "Email Address",
+            "type": "string",
+            "description": "The verified email address."
+        },
+        "status": {
+            "title": "Status",
+            "type": "string",
+            "description": "valid, invalid, risky, or unknown."
+        },
+        "is_reachable": {
+            "title": "Reachability",
+            "type": "string",
+            "description": "safe, invalid, risky, or unknown."
+        },
+        "is_disposable": {
+            "title": "Disposable",
+            "type": "boolean",
+            "description": "True if the email is from a temporary provider."
+        },
+        "is_role_based": {
+            "title": "Role Based",
+            "type": "boolean",
+            "description": "True if the email is a generic role account."
+        },
+        "is_catch_all": {
+            "title": "Catch All",
+            "type": "boolean",
+            "description": "True if the domain accepts all emails."
+        },
+        "is_free_provider": {
+            "title": "Free Provider",
+            "type": "boolean",
+            "description": "True if using Gmail, Yahoo, etc."
+        },
+        "syntax_valid": {
+            "title": "Syntax Valid",
+            "type": "boolean",
+            "description": "True if the email format is correct."
+        },
+        "mx_exists": {
+            "title": "MX Exists",
+            "type": "boolean",
+            "description": "True if the domain has mail servers."
+        },
+        "smtp_reachable": {
+            "title": "SMTP Reachable",
+            "type": "boolean",
+            "description": "True if the mail server responded."
+        },
+        "mx_host": {
+            "title": "MX Host",
+            "type": "string",
+            "description": "The mail server hostname."
+        },
+        "smtp_response": {
+            "title": "SMTP Response",
+            "type": "string",
+            "description": "The exact response from the mail server."
+        },
+        "error_message": {
+            "title": "Error Message",
+            "type": "string",
+            "description": "Error details if the check failed."
+        },
+        "verified_at": {
+            "title": "Verified At",
+            "type": "string",
+            "description": "Timestamp of verification."
+        }
+    }
+}
