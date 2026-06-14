@@ -10,6 +10,7 @@
             "description": "Paste email addresses to verify. One per line.",
             "editor": "stringList",
             "prefill": ["test@gmail.com", "nonexistent12345@gmail.com"],
+            "default": ["test@gmail.com", "nonexistent12345@gmail.com"],
             "items": {
                 "type": "string"
             }
