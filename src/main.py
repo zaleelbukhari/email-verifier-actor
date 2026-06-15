@@ -81,16 +81,18 @@ async def main() -> None:
 
         if len(raw_emails) > effective_cap:
             Actor.log.warning(
-                f"Input list truncated from {len(raw_emails)} to {effective_cap} "
+                f"Input list will be truncated to {effective_cap} "
                 f"(max per run: {effective_cap})"
             )
-            raw_emails = raw_emails[:effective_cap]
 
         # ── 4. Validate format & deduplicate ──
         seen = set()
         emails = []
         invalid_format_count = 0
         for row in raw_emails:
+            if len(emails) + invalid_format_count >= effective_cap:
+                break
+                
             email_val = row.get("__email__", "")
             email_lower = email_val.strip().lower()
             if not email_lower or email_lower in seen:
