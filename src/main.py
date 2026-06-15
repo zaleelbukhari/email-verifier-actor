@@ -102,6 +102,24 @@ async def main() -> None:
         effective_cap = MAX_EMAILS_HARD_CAP
         if max_emails > 0:
             effective_cap = min(max_emails, MAX_EMAILS_HARD_CAP)
+            
+        # ── FREE TRIAL ENFORCEMENT ──
+        is_free_plan = False
+        if os.environ.get("APIFY_IS_AT_HOME"):
+            try:
+                from apify_client import ApifyClient
+                client = ApifyClient(os.environ.get("APIFY_TOKEN"))
+                user_info = client.user().get()
+                if not user_info.get("isPaying"):
+                    is_free_plan = True
+                    effective_cap = min(effective_cap, 100)
+                    Actor.log.warning(
+                        "⚠️ Free Plan detected: Run capped to 100 emails. "
+                        "Please upgrade your Apify account to verify unlimited emails."
+                    )
+            except Exception as e:
+                Actor.log.debug(f"Could not verify user plan: {e}")
+
         if len(emails) > effective_cap:
             Actor.log.warning(
                 f"Email list truncated from {len(emails)} to {effective_cap} "
@@ -111,10 +129,12 @@ async def main() -> None:
 
         total = len(emails)
         total_with_invalid = total + invalid_format_count
+        
+        status_note = " (Free Trial Limit)" if is_free_plan and len(raw_emails) > 100 else ""
         Actor.log.info(
-            f"📋 {total} valid-format emails to verify "
+            f"📋 {total} valid-format emails to verify{status_note} "
             f"({invalid_format_count} invalid format, "
-            f"{len(raw_emails) - total - invalid_format_count} duplicates removed)"
+            f"{len(raw_emails) - total - invalid_format_count} duplicates/cut removed)"
         )
 
         if total == 0:
