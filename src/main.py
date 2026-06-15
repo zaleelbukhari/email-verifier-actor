@@ -63,7 +63,33 @@ async def main() -> None:
             )
             return
 
-        # ── 3. Validate format & deduplicate ──
+        # ── 3. Apply Limits (Free Trial & Hard Caps) ──
+        effective_cap = MAX_EMAILS_HARD_CAP
+        if max_emails > 0:
+            effective_cap = min(max_emails, MAX_EMAILS_HARD_CAP)
+            
+        is_free_plan = False
+        if os.environ.get("APIFY_IS_AT_HOME"):
+            try:
+                user_info = await Actor.apify_client.user().get()
+                if not user_info.get("isPaying"):
+                    is_free_plan = True
+                    effective_cap = min(effective_cap, 100)
+                    Actor.log.warning(
+                        "⚠️ Free Plan detected: Run capped to 100 emails. "
+                        "Please upgrade your Apify account to verify unlimited emails."
+                    )
+            except Exception as e:
+                Actor.log.warning(f"Could not verify user plan: {e}")
+
+        if len(raw_emails) > effective_cap:
+            Actor.log.warning(
+                f"Input list truncated from {len(raw_emails)} to {effective_cap} "
+                f"(max per run: {effective_cap})"
+            )
+            raw_emails = raw_emails[:effective_cap]
+
+        # ── 4. Validate format & deduplicate ──
         seen = set()
         emails = []
         invalid_format_count = 0
@@ -98,39 +124,10 @@ async def main() -> None:
                 })
                 await Actor.push_data(result_row)
 
-        # Apply max emails cap
-        effective_cap = MAX_EMAILS_HARD_CAP
-        if max_emails > 0:
-            effective_cap = min(max_emails, MAX_EMAILS_HARD_CAP)
-            
-        # ── FREE TRIAL ENFORCEMENT ──
-        is_free_plan = False
-        if os.environ.get("APIFY_IS_AT_HOME"):
-            try:
-                from apify_client import ApifyClient
-                client = ApifyClient(os.environ.get("APIFY_TOKEN"))
-                user_info = client.user().get()
-                if not user_info.get("isPaying"):
-                    is_free_plan = True
-                    effective_cap = min(effective_cap, 100)
-                    Actor.log.warning(
-                        "⚠️ Free Plan detected: Run capped to 100 emails. "
-                        "Please upgrade your Apify account to verify unlimited emails."
-                    )
-            except Exception as e:
-                Actor.log.debug(f"Could not verify user plan: {e}")
-
-        if len(emails) > effective_cap:
-            Actor.log.warning(
-                f"Email list truncated from {len(emails)} to {effective_cap} "
-                f"(max per run: {effective_cap})"
-            )
-            emails = emails[:effective_cap]
-
         total = len(emails)
         total_with_invalid = total + invalid_format_count
         
-        status_note = " (Free Trial Limit)" if is_free_plan and len(raw_emails) > 100 else ""
+        status_note = " (Free Trial Limit)" if is_free_plan and total_with_invalid >= 100 else ""
         Actor.log.info(
             f"📋 {total} valid-format emails to verify{status_note} "
             f"({invalid_format_count} invalid format, "
@@ -143,7 +140,7 @@ async def main() -> None:
             )
             return
 
-        # ── 4. Verify emails in parallel ──
+        # ── 5. Verify emails in parallel ──
         semaphore = asyncio.Semaphore(concurrency)
         session = await create_session(timeout)
 
