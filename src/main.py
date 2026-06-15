@@ -70,17 +70,14 @@ async def main() -> None:
             
         is_free_plan = False
         if os.environ.get("APIFY_IS_AT_HOME"):
-            try:
-                user_info = await Actor.apify_client.user().get()
-                if not user_info.get("isPaying"):
-                    is_free_plan = True
-                    effective_cap = min(effective_cap, 100)
-                    Actor.log.warning(
-                        "⚠️ Free Plan detected: Run capped to 100 emails. "
-                        "Please upgrade your Apify account to verify unlimited emails."
-                    )
-            except Exception as e:
-                Actor.log.warning(f"Could not verify user plan: {e}")
+            is_paying = os.environ.get("APIFY_USER_IS_PAYING") == "1"
+            if not is_paying:
+                is_free_plan = True
+                effective_cap = min(effective_cap, 100)
+                Actor.log.warning(
+                    "⚠️ Free Plan detected: Run capped to 100 emails. "
+                    "Please upgrade your Apify account to verify unlimited emails."
+                )
 
         if len(raw_emails) > effective_cap:
             Actor.log.warning(
