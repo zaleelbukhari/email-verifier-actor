@@ -135,7 +135,11 @@ async def _call_reacher(
     email: str,
 ) -> dict:
     """Make a single API call to Reacher."""
-    payload = {"to_email": email}
+    payload = {
+        "to_email": email,
+        "from_email": "verify@skipthelnes.info",
+        "hello_name": "skipthelnes.info",
+    }
 
     async with session.post(REACHER_URL, json=payload) as resp:
         resp.raise_for_status()
@@ -182,17 +186,35 @@ def _parse_response(email: str, data: dict) -> dict:
                 if error_type or error_msg:
                     smtp_desc = f"{error_type}: {error_msg}".strip(": ")
 
+        # Determine if catch-all with confirmed deliverability
+        is_catch_all = smtp.get("is_catch_all", False) if isinstance(smtp, dict) else False
+        is_deliverable = smtp.get("is_deliverable", False) if isinstance(smtp, dict) else False
+        can_connect = smtp.get("can_connect_smtp", False) if isinstance(smtp, dict) else False
+
+        # Reclassify: catch-all domains with confirmed SMTP deliverability
+        # are almost always valid in practice
+        if is_reachable == "risky" and is_catch_all and is_deliverable and can_connect:
+            status = "valid"
+            confidence = "medium"
+        elif is_reachable == "safe":
+            confidence = "high"
+        elif is_reachable == "invalid":
+            confidence = "high"
+        else:
+            confidence = "low"
+
         return {
             "email": email,
             "status": status,
+            "confidence": confidence,
             "is_reachable": is_reachable,
             "is_disposable": misc.get("is_disposable", False),
             "is_role_based": misc.get("is_role_account", False),
-            "is_catch_all": smtp.get("is_catch_all", False) if isinstance(smtp, dict) else False,
+            "is_catch_all": is_catch_all,
             "is_free_provider": misc.get("is_free", False),
             "syntax_valid": syntax.get("is_valid_syntax", True),
             "mx_exists": len(mx_records) > 0,
-            "smtp_reachable": smtp.get("can_connect_smtp", False) if isinstance(smtp, dict) else False,
+            "smtp_reachable": can_connect,
             "mx_host": mx_host,
             "smtp_response": smtp_desc,
             "error_message": "",
@@ -209,6 +231,7 @@ def _error_result(email: str, error_message: str) -> dict:
     return {
         "email": email,
         "status": "unknown",
+        "confidence": "low",
         "is_reachable": "unknown",
         "is_disposable": False,
         "is_role_based": False,

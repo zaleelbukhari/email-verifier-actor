@@ -82,6 +82,7 @@ Each email produces a result row containing all of your original input columns (
 {
     "email": "john@company.com",
     "status": "valid",
+    "confidence": "high",
     "is_reachable": "safe",
     "is_disposable": false,
     "is_role_based": false,
@@ -99,12 +100,13 @@ Each email produces a result row containing all of your original input columns (
 
 ### Business Status (`status`)
 
-| Status | Meaning | Action |
-|:---|:---|:---|
-| `valid` | ✅ Mailbox exists and accepts email | Safe to send |
-| `invalid` | ❌ Mailbox doesn't exist or domain has no mail server | Remove from list |
-| `risky` | ⚠️ Mailbox exists but may be a catch-all, disposable, or role-based | Review manually |
-| `unknown` | ❓ Could not determine — server timeout or temporary error | Retry later |
+| Status | Meaning | Confidence | Action |
+|:---|:---|:---|:---|
+| `valid` | ✅ Mailbox exists and accepts email | `high` | Safe to send |
+| `valid` | ✅ Catch-all domain but SMTP confirmed delivery | `medium` | Safe to send (catch-all) |
+| `invalid` | ❌ Mailbox doesn't exist or domain has no mail server | `high` | Remove from list |
+| `risky` | ⚠️ Disposable, role-based, or unconfirmed catch-all | `low` | Review manually |
+| `unknown` | ❓ Could not determine — server timeout or temporary error | `low` | Retry later |
 
 ### Technical Details
 

@@ -110,6 +110,7 @@ async def main() -> None:
                 result_row.update({
                     "email": email_val.strip(),
                     "status": "invalid",
+                    "confidence": "high",
                     "is_reachable": "invalid",
                     "is_disposable": False,
                     "is_role_based": False,
