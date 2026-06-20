@@ -217,6 +217,16 @@ echo '{
 }' | apify call YOUR_USERNAME/email-verifier-pro --output-dataset
 ```
 
-## Support
+## Changelog
 
-Found a bug or have a suggestion? Open an issue in the **Issues** tab — I respond within 24 hours.
+We actively maintain Email Verifier Pro to ensure maximum reliability and accuracy.
+
+- **v1.1.0** — Added support for preserving all original input columns (like Names, Company, IDs) through the verification pipeline!
+- **v1.0.6** — Improved automated daily health checks to guarantee 99.9% uptime.
+- **v1.0.5** — Enhanced Apify dataset streaming for zero data loss during massive runs.
+
+## Support & Reliability
+
+This Actor is actively maintained. We strive for 100% reliability and are highly responsive to our users.
+
+Found a bug, need a feature, or have a suggestion? Open an issue in our [GitHub Issues tab](https://github.com/zaleelbukhari/email-verifier-actor/issues) — we prioritize user feedback and respond within 24 hours.
