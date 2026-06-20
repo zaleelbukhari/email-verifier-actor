@@ -10,12 +10,13 @@ import asyncio
 import time
 import os
 import aiohttp
+from collections import defaultdict
 from datetime import datetime, timezone
 
 from apify import Actor
 
 from .input_parser import parse_input, validate_email_format
-from .verifier import verify_email, create_session, close_session
+from .verifier import verify_email, create_session, close_session, _error_result
 from .stats import increment_stats, get_stats
 
 
@@ -174,13 +175,20 @@ async def main() -> None:
                     timeout=timeout,
                 )
 
-                # Merge verification result into original row
-                final_result = dict(row)
-                final_result.pop("__email__", None)
-                final_result.update(result)
+                # Track verification status for retry logic
+                row["__verification_status__"] = result.get("status", "unknown")
 
-                # Push result to dataset immediately (live results)
-                await Actor.push_data(final_result)
+                # Only push non-unknown results in first pass
+                # (unknowns get a second chance in the retry pass)
+                if result.get("status") != "unknown":
+                    # Merge verification result into original row
+                    final_result = dict(row)
+                    final_result.pop("__email__", None)
+                    final_result.pop("__verification_status__", None)
+                    final_result.update(result)
+
+                    # Push result to dataset immediately (live results)
+                    await Actor.push_data(final_result)
 
                 # Update counters
                 status = result.get("status", "unknown")
@@ -236,8 +244,81 @@ async def main() -> None:
             f"🔍 Verifying {total} emails (concurrency: {concurrency})..."
         )
 
-        tasks = [process_email(row) for row in emails]
+        # ── Domain-aware batching: group by domain to avoid hammering ──
+        domain_groups = defaultdict(list)
+        for row in emails:
+            email_val = row.get("__email__", "")
+            domain = email_val.split("@")[-1] if "@" in email_val else "unknown"
+            domain_groups[domain].append(row)
+
+        # Interleave emails from different domains to spread load
+        interleaved = []
+        domain_lists = list(domain_groups.values())
+        max_len = max(len(lst) for lst in domain_lists) if domain_lists else 0
+        for i in range(max_len):
+            for lst in domain_lists:
+                if i < len(lst):
+                    interleaved.append(lst[i])
+
+        tasks = [process_email(row) for row in interleaved]
         await asyncio.gather(*tasks, return_exceptions=True)
+
+        # ── Second pass: auto-retry unknowns with longer timeout ──
+        unknown_rows = [
+            row for row in interleaved
+            if row.get("__verification_status__") == "unknown"
+        ]
+        if unknown_rows:
+            retry_count = len(unknown_rows)
+            Actor.log.info(
+                f"🔄 Retrying {retry_count} unknown emails with extended timeout..."
+            )
+            await Actor.set_status_message(
+                f"🔄 Retrying {retry_count} unknown emails..."
+            )
+            # Use a longer timeout and lower concurrency for retries
+            retry_session = await create_session(min(timeout * 2, 120))
+            retry_semaphore = asyncio.Semaphore(max(concurrency // 2, 3))
+
+            async def retry_email(row: dict) -> None:
+                email_val = row.get("__email__", "")
+                async with retry_semaphore:
+                    # Small delay between retries
+                    await asyncio.sleep(1)
+                    result = await verify_email(
+                        session=retry_session,
+                        email=email_val,
+                        max_retries=1,
+                        timeout=min(timeout * 2, 120),
+                    )
+                    if result.get("status") != "unknown":
+                        # Improved result! Push updated data
+                        final_result = dict(row)
+                        final_result.pop("__email__", None)
+                        final_result.pop("__verification_status__", None)
+                        final_result.update(result)
+                        await Actor.push_data(final_result)
+                        # Update counters
+                        new_status = result.get("status", "unknown")
+                        counters[new_status] = counters.get(new_status, 0) + 1
+                        counters["unknown"] -= 1
+                        Actor.log.debug(
+                            f"✅ Retry succeeded for {email_val}: {new_status}"
+                        )
+
+            retry_tasks = [retry_email(row) for row in unknown_rows]
+            await asyncio.gather(*retry_tasks, return_exceptions=True)
+            await close_session(retry_session)
+
+        # Push any remaining unknowns that didn't improve after retry
+        for row in interleaved:
+            if row.get("__verification_status__") == "unknown":
+                final_result = dict(row)
+                final_result.pop("__email__", None)
+                final_result.pop("__verification_status__", None)
+                # Create a minimal unknown result
+                final_result.update(_error_result(row.get("__email__", ""), "Could not verify after retry"))
+                await Actor.push_data(final_result)
 
         await close_session(session)
 
