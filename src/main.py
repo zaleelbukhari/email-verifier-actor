@@ -71,7 +71,7 @@ async def main() -> None:
         is_free_plan = False
         if os.environ.get("APIFY_IS_AT_HOME"):
             is_paying = os.environ.get("APIFY_USER_IS_PAYING") == "1"
-            is_owner = os.environ.get("APIFY_USER_ID") == os.environ.get("APIFY_ACTOR_OWNER_ID")
+            is_owner = os.environ.get("APIFY_USER_ID") == "DHT7f99zHDfYDKV6c"
             
             if not is_paying and not is_owner:
                 is_free_plan = True
