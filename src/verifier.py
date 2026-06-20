@@ -191,17 +191,18 @@ def _parse_response(email: str, data: dict) -> dict:
         is_deliverable = smtp.get("is_deliverable", False) if isinstance(smtp, dict) else False
         can_connect = smtp.get("can_connect_smtp", False) if isinstance(smtp, dict) else False
 
-        # Reclassify: catch-all domains with confirmed SMTP deliverability
-        # are almost always valid in practice
         is_role_account = misc.get("is_role_account", False)
-        if is_reachable == "risky" and is_catch_all and is_deliverable and can_connect:
-            status = "valid"
-            confidence = "medium"
-        elif is_reachable == "risky" and is_role_account and is_deliverable and can_connect and not misc.get("is_disposable", False):
-            # Role-based emails (info@, admin@) at real domains are valid
-            # addresses — just flag them so users can decide
-            status = "valid"
-            confidence = "medium"
+        
+        # We no longer aggressively reclassify risky as valid to remain conservative.
+        # Instead, we set a 'medium' confidence flag so the user can optionally
+        # filter for them if they want to maximize reach.
+        if is_reachable == "risky":
+            if is_catch_all and is_deliverable and can_connect:
+                confidence = "medium"
+            elif is_role_account and is_deliverable and can_connect and not misc.get("is_disposable", False):
+                confidence = "medium"
+            else:
+                confidence = "low"
         elif is_reachable == "safe":
             confidence = "high"
         elif is_reachable == "invalid":
