@@ -71,7 +71,9 @@ async def main() -> None:
         is_free_plan = False
         if os.environ.get("APIFY_IS_AT_HOME"):
             is_paying = os.environ.get("APIFY_USER_IS_PAYING") == "1"
-            if not is_paying:
+            is_owner = os.environ.get("APIFY_USER_ID") == os.environ.get("APIFY_ACTOR_OWNER_ID")
+            
+            if not is_paying and not is_owner:
                 is_free_plan = True
                 effective_cap = min(effective_cap, 100)
                 Actor.log.warning(
