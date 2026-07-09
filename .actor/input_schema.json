@@ -29,6 +29,13 @@
             "editor": "textfield",
             "example": "abc123def456"
         },
+        "apifyToken": {
+            "title": "Apify API Token (Optional)",
+            "type": "string",
+            "description": "If your Dataset ID gives an 'Insufficient Permissions' error, paste your Personal Apify API Token here to give the Actor access to read it.",
+            "editor": "textfield",
+            "isSecret": true
+        },
         "emailColumn": {
             "title": "Email Column Name",
             "type": "string",

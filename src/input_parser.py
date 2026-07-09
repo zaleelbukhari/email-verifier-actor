@@ -16,6 +16,7 @@ import re
 import aiohttp
 
 from apify import Actor
+from apify_client import ApifyClientAsync
 
 
 # Common column names for email fields (case-insensitive matching)
@@ -84,6 +85,7 @@ async def parse_input(actor_input: dict) -> list[dict]:
         ds_emails = await _parse_dataset(
             dataset_id,
             actor_input.get("emailColumn", ""),
+            actor_input.get("apifyToken", "").strip(),
         )
         if ds_emails:
             Actor.log.info(f"📋 Found {len(ds_emails)} emails from dataset")
@@ -139,14 +141,21 @@ async def _parse_csv_url(url: str, email_column: str = "") -> list[dict]:
     return _extract_emails_from_csv(text, email_column)
 
 
-async def _parse_dataset(dataset_id: str, email_column: str = "") -> list[dict]:
+async def _parse_dataset(dataset_id: str, email_column: str = "", apify_token: str = "") -> list[dict]:
     """Read emails from an existing Apify dataset."""
     Actor.log.info(f"📥 Reading from Apify dataset: {dataset_id}")
 
     try:
-        dataset = await Actor.open_dataset(id=dataset_id)
-        data = await dataset.get_data()
-        items = data.items if hasattr(data, "items") else []
+        if apify_token:
+            Actor.log.info("Using provided API Token to bypass scoped permissions...")
+            client = ApifyClientAsync(apify_token)
+            dataset_client = client.dataset(dataset_id)
+            items_page = await dataset_client.list_items()
+            items = items_page.items
+        else:
+            dataset = await Actor.open_dataset(id=dataset_id)
+            data = await dataset.get_data()
+            items = data.items if hasattr(data, "items") else []
     except Exception as e:
         raise ValueError(
             f"Failed to read dataset '{dataset_id}': {str(e)}. "
