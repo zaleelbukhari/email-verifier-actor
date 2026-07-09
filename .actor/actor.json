@@ -1,17 +1,17 @@
 {
     "actorSpecification": 1,
     "name": "email-verifier-pro",
-    "title": "Email Verifier Pro | $0.85/1k - Bulk Email Validator",
-    "description": "Verify email addresses in bulk with real SMTP checks. Detect disposable, role-based, and catch-all emails. CSV upload, live progress, smart retries. Cheapest full-SMTP verifier on the Store at $0.85/1k emails.",
-    "seoTitle": "Email Verifier: Validate & Clean Email Lists in Bulk",
-    "seoDescription": "Bulk email verifier with SMTP validation. Check email deliverability, detect disposable emails & reduce bounce rates. CSV upload supported. $0.85 per 1,000 emails.",
+    "title": "Email Verifier & Validator (No API Key Required)",
+    "description": "Bulk verify and validate email lists to improve deliverability and reduce bounce rates. Includes SMTP, MX, and Catch-all checks. No external API key required.",
+    "seoTitle": "Email Verifier & Validator: Bulk Validate Emails",
+    "seoDescription": "Bulk verify and validate email lists to improve deliverability and reduce bounce rates. Includes SMTP, MX, and Catch-all checks. No external API key required.",
     "version": "1.0",
     "buildTag": "latest",
     "input": "./input_schema.json",
     "output": "./output_schema.json",
     "dockerfile": "./Dockerfile",
     "readme": "../README.md",
-    "categories": ["LEAD_GENERATION"],
+    "categories": ["LEAD_GENERATION", "MARKETING", "BUSINESS"],
     "pricingModel": {
         "pricingType": "PAY_PER_EVENT",
         "pricePerEvent": {

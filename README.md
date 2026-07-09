@@ -1,8 +1,19 @@
-# Email Verifier Pro | $0.85/1k — Bulk Email Validation & List Cleaning
+# Email Verifier & Validator (No API Key Required)
 
 Verify email addresses at scale with **real SMTP checks** — not just syntax validation. Email Verifier Pro connects directly to mail servers to confirm whether a mailbox actually exists, giving you the most accurate results possible.
 
 **Stop wasting money on bounced emails.** Whether you're doing cold outreach, cleaning your CRM, or validating lead lists, this actor tells you exactly which emails are safe to send to and which ones will bounce.
+
+## Core Features (What We Check)
+
+To ensure maximum deliverability and reduce bounce rates, our verifier performs the following checks on every email:
+
+*   **Syntax Check**: Validates the email format (`user@domain.com`).
+*   **Domain & MX Record Check**: Confirms the domain has a configured mail server.
+*   **Disposable Email Detection**: Flags temporary and burner emails.
+*   **Catch-All Domain Detection**: Identifies domains that accept all mail, helping you filter out risky leads.
+*   **Role-Based Email Detection**: Flags shared inboxes like `info@` or `admin@`.
+*   **Deep SMTP Handshake**: Connects to the mail server to confirm the specific mailbox exists without sending an actual email.
 
 ## Why Email Verifier Pro?
 
@@ -28,18 +39,18 @@ Verify email addresses at scale with **real SMTP checks** — not just syntax va
 - **E-commerce** — Verify customer email addresses at checkout to reduce failed order confirmations
 - **Data enrichment pipelines** — Chain with other Apify actors: scrape emails → verify → export clean list
 
-## How It Works
-
-Email Verifier Pro performs **7 checks** on every email address:
-
 ### Why Choose Email Verifier Pro?
 - ⚡ **Lightning Fast:** Defaults to 10 simultaneous connections. Verify massive lists in minutes, not hours.
 - 🎯 **Deep SMTP Validation:** We don't just check syntax. We talk directly to the target mail server.
-- 💰 **Cheapest Full-SMTP Validation:** Just $0.85 per 1,000 emails. Others charge $2.00+ for the same accuracy.
-- 🎁 **100 Email Free Trial:** Users on the free Apify plan can fetch up to 100 leads per run to test the accuracy before paying!
+- 💰 **Cheapest Full-SMTP Validation:** Compute-based pricing allows for ultra-cheap verification compared to per-result services.
+- 🎁 **100 Email Free Tier:** Users on the free Apify plan can verify up to 100 leads per run to test the accuracy before scaling!
 - 🛡️ **Role-Based & Disposable Detection:** Automatically flags `info@`, `admin@`, and temporary inboxes.
 - 🔗 **Keeps Your Original Data:** Upload a CSV with names, companies, and custom IDs. We'll append the verification results without throwing away your original columns!
-- 📈 **Live Progress Tracking:** See valid/invalid ratios in real-time as your list processes.)
+- 📈 **Live Progress Tracking:** See valid/invalid ratios in real-time as your list processes.
+
+## How It Works
+
+Email Verifier Pro performs **7 checks** on every email address:
 
 1. **Syntax validation** — Is the email format correct? (`user@domain.com`)
 2. **MX record lookup** — Does the domain have a mail server configured?
